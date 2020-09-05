@@ -2,18 +2,22 @@ const https = require('https');
 const { refreshDolar, DolarData } = require('./dolar_utils');
 
 function handler(request, response) {
-  let requestParsed = JSON.parse(request.body);
-  let chatId = requestParsed.message.chat.id;
-  console.log(chatId);
-  if (request.url === '/dolarkac') {
-    refreshDolar(dolarData => {
-      console.log(dolarData);
-      sendMessage(chatId, `Durumum:+${dolarData.current}`);
-    }, null);
+  try {
+    let requestParsed = JSON.parse(request.body);
+    let chatId = requestParsed.message.chat.id;
+    console.log(chatId);
+    if (request.url === '/dolarkac') {
+      refreshDolar(dolarData => {
+        console.log(dolarData);
+        sendMessage(chatId, `Durumum:+${dolarData.current}`);
+      }, null);
+    }
+  } catch (error) {
+    console.log(error);
   }
 
   response.writeHead(200);
-  response.end();
+  response.end('All done!');
 }
 
 function sendMessage(chatId, message) {
