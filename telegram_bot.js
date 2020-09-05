@@ -2,6 +2,9 @@ const https = require('https');
 const { refreshDolar, DolarData } = require('./dolar_utils');
 
 function handler(request, response) {
+  response.writeHead(200);
+  response.end('All done!');
+  
   try {
     let requestParsed = JSON.parse(request.body);
     let chatId = requestParsed.message.chat.id;
@@ -15,9 +18,6 @@ function handler(request, response) {
   } catch (error) {
     console.log(error);
   }
-
-  response.writeHead(200);
-  response.end('All done!');
 }
 
 function sendMessage(chatId, message) {
