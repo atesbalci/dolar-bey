@@ -21,5 +21,5 @@ function sendMessage(chatId, message) {
 }
 
 module.exports.startServer = function startServer() {
-  https.createServer(handler).listen(80);
+  https.createServer(handler).listen(process.env.PORT || 80);
 }
