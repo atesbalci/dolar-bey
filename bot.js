@@ -51,6 +51,7 @@ module.exports.startDolarBot = function startDolarBot(token) {
   });
 
   refreshDolar(null, null);
+  setInterval(() => refreshDolar(null, onRecord), 300000);
 
   client.login(token);
 }
