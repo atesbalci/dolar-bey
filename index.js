@@ -1,3 +1,3 @@
-const { startBot } = require("./bot");
+const { startDolarBot } = require("./bot");
 
-startBot(process.env.BOT_TOKEN);
+startDolarBot(process.env.BOT_TOKEN);
