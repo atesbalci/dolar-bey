@@ -32,7 +32,7 @@ function onRecord(dolarData) {
   channel.send(`REKORLARDAYIM: ${dolarData.record}`);
 }
 
-module.exports.startBot = function startBot(token) {
+module.exports.startDolarBot = function startDolarBot(token) {
   const client = new Discord.Client();
 
   client.on('ready', () => {
