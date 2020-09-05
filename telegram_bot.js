@@ -1,4 +1,3 @@
-const http = require('http');
 const https = require('https');
 const { refreshDolar, DolarData } = require('./dolar_utils');
 
@@ -22,5 +21,5 @@ function sendMessage(chatId, message) {
 }
 
 module.exports.startServer = function startServer() {
-  http.createServer(handler).listen(80);
+  https.createServer(handler).listen(80);
 }
