@@ -1,6 +1,6 @@
 const Discord = require('discord.js');
 const { getTime, deleteMessage } = require('./utils');
-const { refreshDolar } = require('./dolar_utils');
+const { refreshDolar, recordListeners } = require('./dolar_utils');
 let channel;
 
 async function DM(msg) {
@@ -22,7 +22,7 @@ async function TEXT(msg) {
         msg.channel.send(`Durumum: ${dolarData.current}`);
       }
       // deleteMessage(msg);
-    }, onRecord);
+    });
   } catch (err) {
     console.log(err);
   }
@@ -50,8 +50,9 @@ module.exports.startDolarBot = function startDolarBot(token) {
     console.error(`${getTime()}: Unhandled promise rejection:`, error);
   });
 
-  refreshDolar(null, null);
-  setInterval(() => refreshDolar(null, onRecord), 300000);
+  refreshDolar(null);
+  recordListeners.push(onRecord);
+  setInterval(() => refreshDolar(null), 300000);
 
   client.login(token);
 }

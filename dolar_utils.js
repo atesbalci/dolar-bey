@@ -4,6 +4,10 @@ const nowRegex = /imdi \$1 = ([0-9]+.[0-9]+)/;
 const recordRegex = /zamanlar Rekor \$1 = ([0-9]+.[0-9]+)/;
 const dailyRecordRegex = /i Rekor \$1 = ([0-9]+.[0-9]+)/;
 
+const recordListeners = [];
+
+module.exports.recordListeners = recordListeners;
+
 let dolarData = null;
 
 class DolarData {
@@ -16,7 +20,13 @@ class DolarData {
 
 module.exports.DolarData = DolarData;
 
-module.exports.refreshDolar = function refreshDolar(callback, recordCallback) {
+function onRecord(dolarData) {
+  recordListeners.forEach(element => {
+    element(dolarData);
+  });
+}
+
+module.exports.refreshDolar = function refreshDolar(callback) {
   https.get('https://dolarrekorkirdimi.com', response => {
     let body = '';
     response.on('data', chunk => {
@@ -24,10 +34,11 @@ module.exports.refreshDolar = function refreshDolar(callback, recordCallback) {
     });
     response.on('end', () => {
       try {
+        const tolerance = parseFloat(process.env.DOLAR_RECORD_TOLERANCE);
         let newDolarData = new DolarData(body.match(nowRegex)[1], body.match(recordRegex)[1], body.match(dailyRecordRegex)[1]);
         if (dolarData != null) {
-          if (dolarData.record < newDolarData.record) {
-            if(recordCallback != null) recordCallback(newDolarData);
+          if (parseFloat(dolarData.record) + tolerance < parseFloat(newDolarData.record)) {
+            onRecord(newDolarData);
           }
         }
 
