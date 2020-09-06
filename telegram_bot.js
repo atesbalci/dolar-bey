@@ -1,23 +1,24 @@
 const https = require('https');
+const express = require('express');
 const { refreshDolar, DolarData } = require('./dolar_utils');
+const app = express();
 
 function handler(request, response) {
-  response.writeHead(200);
-  response.end('All done!');
+  response.send('All done!');
   
-  try {
-    let requestParsed = JSON.parse(request.body);
-    let chatId = requestParsed.message.chat.id;
-    console.log(chatId);
-    if (request.url === '/dolarkac') {
-      refreshDolar(dolarData => {
-        console.log(dolarData);
-        sendMessage(chatId, `Durumum:+${dolarData.current}`);
-      }, null);
-    }
-  } catch (error) {
-    console.log(error);
-  }
+  // try {
+  //   let requestParsed = JSON.parse(request.body);
+  //   let chatId = requestParsed.message.chat.id;
+  //   console.log(chatId);
+  //   if (request.url === '/dolarkac') {
+  //     refreshDolar(dolarData => {
+  //       console.log(dolarData);
+  //       sendMessage(chatId, `Durumum:+${dolarData.current}`);
+  //     }, null);
+  //   }
+  // } catch (error) {
+  //   console.log(error);
+  // }
 }
 
 function sendMessage(chatId, message) {
@@ -25,5 +26,9 @@ function sendMessage(chatId, message) {
 }
 
 module.exports.startServer = function startServer() {
-  https.createServer(handler).listen(process.env.PORT || 80);
+  app.get('/', handler);
+  let port = process.env.PORT || 80;
+  app.listen(port, () => {
+    console.log(`Example app listening at http://localhost:${port}`)
+  });
 }
