@@ -2,7 +2,7 @@ const https = require('https');
 const { refreshDolar, DolarData } = require('./dolar_utils');
 
 module.exports.prepareDolarTelegramExpress = function prepareDolarTelegramExpress(expressApp) {  
-  expressApp.post('/getdolar', (req, res) => {
+  expressApp.post('/', (req, res) => {
     res.send('All done!');
     try {
       console.log(req.body);
