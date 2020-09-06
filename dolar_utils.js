@@ -8,7 +8,7 @@ const recordListeners = [];
 
 module.exports.recordListeners = recordListeners;
 
-let dolarData = null;
+let lastRecord = 0.0;
 
 class DolarData {
   constructor(current, record, dailyRecord) {
@@ -21,6 +21,7 @@ class DolarData {
 module.exports.DolarData = DolarData;
 
 function onRecord(dolarData) {
+  lastRecord = parseFloat(dolarData.record);
   recordListeners.forEach(element => {
     element(dolarData);
   });
@@ -36,13 +37,16 @@ module.exports.refreshDolar = function refreshDolar(callback) {
       try {
         const tolerance = parseFloat(process.env.DOLAR_RECORD_TOLERANCE);
         let newDolarData = new DolarData(body.match(nowRegex)[1], body.match(recordRegex)[1], body.match(dailyRecordRegex)[1]);
-        if (dolarData != null) {
-          if (parseFloat(dolarData.record) + tolerance < parseFloat(newDolarData.record)) {
+        
+        if (lastRecord > 0.001) {
+          if (lastRecord + tolerance < parseFloat(newDolarData.record)) {
             onRecord(newDolarData);
           }
         }
+        else {
+          lastRecord = parseFloat(newDolarData.record);
+        }
 
-        dolarData = newDolarData;
         if(callback != null) callback(newDolarData);
       } catch (err) {
         console.log(err);
