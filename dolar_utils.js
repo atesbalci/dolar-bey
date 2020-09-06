@@ -34,9 +34,10 @@ module.exports.refreshDolar = function refreshDolar(callback) {
     });
     response.on('end', () => {
       try {
+        const tolerance = parseFloat(process.env.DOLAR_RECORD_TOLERANCE);
         let newDolarData = new DolarData(body.match(nowRegex)[1], body.match(recordRegex)[1], body.match(dailyRecordRegex)[1]);
         if (dolarData != null) {
-          if (parseFloat(dolarData.record) + 0.0001 > parseFloat(newDolarData.record)) {
+          if (parseFloat(dolarData.record) + tolerance < parseFloat(newDolarData.record)) {
             onRecord(newDolarData);
           }
         }

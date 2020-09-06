@@ -9,7 +9,8 @@ module.exports.prepareDolarTelegramExpress = function prepareDolarTelegramExpres
       let chatId = req.body.message.chat.id;
       let command = req.body.message.text;
 
-      if (command.includes('/getdolar')) {
+      console.log(chatId);
+      if (command.includes('/dolarkac')) {
         refreshDolar(dolarData => {
           sendMessage(chatId, `Durumum:+${dolarData.current}`);
         });
