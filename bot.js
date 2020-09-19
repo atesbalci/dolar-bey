@@ -29,13 +29,13 @@ async function TEXT(msg) {
     refreshDolar(dolarData => {
       if (msg.content.includes('gun')) {
         msg.channel.send(`Gunluk Rekorum: ${dolarData.dailyRecord}`)
-          .then(msg => sendMessageBerat(msg.channel.id, beratDesperate[getRandomInt(beratDesperate.length)]));
+          .then(msg => sendMessageBerat(msg.channel.id, getRandomDesperateBerat()));
       } else if (msg.content.includes('rekor')) {
         msg.channel.send(`Rekorum: ${dolarData.record}`)
-          .then(msg => sendMessageBerat(msg.channel.id, beratDesperate[getRandomInt(beratDesperate.length)]));
+          .then(msg => sendMessageBerat(msg.channel.id, getRandomDesperateBerat()));
       } else {
         msg.channel.send(`Durumum: ${dolarData.current}`)
-          .then(msg => sendMessageBerat(msg.channel.id, beratRegular[getRandomInt(beratRegular.length)]));
+          .then(msg => sendMessageBerat(msg.channel.id, getRandomRegularBerat()));
       }
       // deleteMessage(msg);
     });
@@ -46,7 +46,7 @@ async function TEXT(msg) {
 
 function onRecord(dolarData) {
   channel.send(`REKORLARDAYIM: ${dolarData.record}`)
-    .then(msg => sendMessageBerat(msg.channel.id, 'Ezanlari susturamayacaklar!'));
+    .then(msg => getRandomDesperateBerat());
 }
 
 function sendMessageBerat(channelId, message) {
@@ -54,6 +54,14 @@ function sendMessageBerat(channelId, message) {
     .then(msg => setTimeout(() => {
       deleteMessage(msg);
     }, 30000)));
+}
+
+function getRandomDesperateBerat() {
+  return beratDesperate[getRandomInt(beratDesperate.length)];
+}
+
+function getRandomRegularBerat() {
+  return beratRegular[getRandomInt(beratRegular.length)];
 }
 
 function getRandomInt(max) {
