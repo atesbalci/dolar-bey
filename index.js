@@ -5,7 +5,10 @@ const app = express();
 
 function startTelegramServer() {
   app.use(express.json());
-  app.post('/', handleDolarTelegram);
+  app.post('/', (req, res) => {
+    res.send('All done!');
+    handleDolarTelegram(req, res);
+  });
   app.listen(process.env.PORT || 80, () => console.log('Listening...'));
 }
 
