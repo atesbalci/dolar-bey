@@ -1,6 +1,18 @@
 const Discord = require('discord.js');
 const { getTime, deleteMessage } = require('./utils');
 const { refreshDolar, recordListeners } = require('./dolar_utils');
+
+const beratRegular = [
+  "Dolarla mı maaş alıyorsun?",
+  "Dolar 10 lira olacak, 15 lira olacak ya, toplayalım dolarları...\nDolar düştü 5 liraya, şimdi bunlar kara kara düşünüyor...",
+  "Mercedes, BMW'ye binmek isteyenler kurdan rahatsız, vatandaşın böyle derdi yok!"
+];
+
+const beratDesperate = [
+  "Ezanları susturamayacaklar!",
+  "Türkiye, tarihinde ilk defa rekabetçi bir kur düzeyiyle ekonomisini dönüştürecek yapıya kavuştu."
+];
+
 let channel;
 let beratClient;
 
@@ -17,13 +29,13 @@ async function TEXT(msg) {
     refreshDolar(dolarData => {
       if (msg.content.includes('gun')) {
         msg.channel.send(`Gunluk Rekorum: ${dolarData.dailyRecord}`)
-          .then(msg => sendMessageBerat(msg.channel.id, 'Ezanlari susturamayacaklar!'));
+          .then(msg => sendMessageBerat(msg.channel.id, beratDesperate[getRandomInt(beratDesperate.length)]));
       } else if (msg.content.includes('rekor')) {
         msg.channel.send(`Rekorum: ${dolarData.record}`)
-          .then(msg => sendMessageBerat(msg.channel.id, 'Ezanlari susturamayacaklar!'));
+          .then(msg => sendMessageBerat(msg.channel.id, beratDesperate[getRandomInt(beratDesperate.length)]));
       } else {
         msg.channel.send(`Durumum: ${dolarData.current}`)
-          .then(msg => sendMessageBerat(msg.channel.id, 'Dolarla mi maas aliyorsun?'));
+          .then(msg => sendMessageBerat(msg.channel.id, beratRegular[getRandomInt(beratRegular.length)]));
       }
       // deleteMessage(msg);
     });
@@ -38,7 +50,14 @@ function onRecord(dolarData) {
 }
 
 function sendMessageBerat(channelId, message) {
-  beratClient.channels.fetch(channelId).then(ch => ch.send(message));
+  beratClient.channels.fetch(channelId).then(ch => ch.send(message)
+    .then(msg => setTimeout(() => {
+      deleteMessage(msg);
+    }, 30000)));
+}
+
+function getRandomInt(max) {
+  return Math.floor(Math.random() * Math.floor(max));
 }
 
 module.exports.startDolarBot = function startDolarBot(token, beratToken) {
