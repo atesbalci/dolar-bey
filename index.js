@@ -12,5 +12,5 @@ function startTelegramServer() {
   app.listen(process.env.PORT || 80, () => console.log('Listening...'));
 }
 
-startDolarBot(process.env.BOT_TOKEN);
+startDolarBot(process.env.BOT_TOKEN, process.env.BERAT_BOT_TOKEN);
 startTelegramServer();
