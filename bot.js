@@ -19,7 +19,7 @@ async function TEXT(msg) {
       } else if (msg.content.includes('rekor')) {
         msg.channel.send(`Rekorum: ${dolarData.record}`);
       } else {
-        msg.channel.send(`Durumum: ${dolarData.current} ${new Date().getUTCHours()}`);
+        msg.channel.send(`Durumum: ${dolarData.current}`);
       }
       // deleteMessage(msg);
     });
