@@ -1,11 +1,11 @@
 const { startDolarBot } = require("./bot");
-const { prepareDolarTelegramExpress } = require("./telegram_bot");
+const { handleDolarTelegram } = require("./telegram_bot");
 const express = require('express');
 const app = express();
 
 function startTelegramServer() {
   app.use(express.json());
-  prepareDolarTelegramExpress(app);
+  app.post('/', handleDolarTelegram);
   app.listen(process.env.PORT || 80, () => console.log('Listening...'));
 }
 

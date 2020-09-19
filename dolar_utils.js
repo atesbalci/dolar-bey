@@ -22,9 +22,12 @@ module.exports.DolarData = DolarData;
 
 function onRecord(dolarData) {
   lastRecord = parseFloat(dolarData.record);
-  recordListeners.forEach(element => {
-    element(dolarData);
-  });
+  const hour = new Date().getUTCHours();
+  if (hour > 3) { // Basically equivalent to 6AM Turkey (disables record messages between 3AM-6AM)
+    recordListeners.forEach(element => {
+      element(dolarData);
+    });
+  }
 }
 
 module.exports.refreshDolar = function refreshDolar(callback) {
