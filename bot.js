@@ -5,7 +5,8 @@ const { refreshDolar, recordListeners } = require('./dolar_utils');
 const beratRegular = [
   "Dolarla mı maaş alıyorsun?",
   "Dolar 10 lira olacak, 15 lira olacak ya, toplayalım dolarları...\nDolar düştü 5 liraya, şimdi bunlar kara kara düşünüyor...",
-  "Mercedes, BMW'ye binmek isteyenler kurdan rahatsız, vatandaşın böyle derdi yok!"
+  "Mercedes, BMW'ye binmek isteyenler kurdan rahatsız, vatandaşın böyle derdi yok!",
+  "Kur benim için hiç önemli değil, hiç oraya bakmıyorum.\nArtık kur bizim elimizde."
 ];
 
 const beratDesperate = [
@@ -46,7 +47,7 @@ async function TEXT(msg) {
 
 function onRecord(dolarData) {
   channel.send(`REKORLARDAYIM: ${dolarData.record}`)
-    .then(msg => getRandomDesperateBerat());
+    .then(msg => sendMessageBerat(msg.channel.id, getRandomDesperateBerat()));
 }
 
 function sendMessageBerat(channelId, message) {
