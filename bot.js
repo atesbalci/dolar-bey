@@ -51,10 +51,10 @@ function onRecord(dolarData) {
 }
 
 function sendMessageBerat(channelId, message) {
-  beratClient.channels.fetch(channelId).then(ch => ch.send(message)
-    .then(msg => setTimeout(() => {
-      deleteMessage(msg);
-    }, 30000)));
+  // beratClient.channels.fetch(channelId).then(ch => ch.send(message)
+  //   .then(msg => setTimeout(() => {
+  //     deleteMessage(msg);
+  //   }, 30000)));
 }
 
 function getRandomDesperateBerat() {
@@ -71,7 +71,7 @@ function getRandomInt(max) {
 
 module.exports.startDolarBot = function startDolarBot(token, beratToken) {
   const client = new Discord.Client();
-  beratClient = new Discord.Client();
+  // beratClient = new Discord.Client();
 
   client.on('ready', () => {
     console.log(`${getTime()}: Logged in as ${client.user.tag}\n===============================================`);
@@ -93,5 +93,5 @@ module.exports.startDolarBot = function startDolarBot(token, beratToken) {
   setInterval(() => refreshDolar(null), 300000);
 
   client.login(token);
-  beratClient.login(beratToken);
+  // beratClient.login(beratToken);
 }
