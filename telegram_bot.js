@@ -1,5 +1,5 @@
 const https = require('https');
-const { refreshDolar, DolarData, recordListeners } = require('./dolar_utils');
+const { refreshDolar, DolarData, recordListeners, localReferenceListeners } = require('./dolar_utils');
 
 module.exports.handleDolarTelegram = function handleDolarTelegram(req, res) {
   try {
@@ -28,6 +28,7 @@ module.exports.handleDolarTelegram = function handleDolarTelegram(req, res) {
 
 module.exports.initDolarTelegram = function initDolarTelegram() {
   recordListeners.push(onRecord);
+  localReferenceListeners.push(onLocalReferenceChange);
 }
 
 function sendMessage(chatId, message) {
@@ -36,4 +37,15 @@ function sendMessage(chatId, message) {
 
 function onRecord(dolarData) {
   sendMessage(process.env.DOLAR_TELEGRAM_GROUP_ID, `REKORLARDAYIM:+${dolarData.record}`);
+}
+
+function onLocalReferenceChange(dolarData, diff) {
+  let message;
+  if (diff > 0) {
+    message = `CIKI$LARDAYIM:+${dolarData.current}`;
+  } else {
+    message = `DU$U$LERDEYIM:+${dolarData.current}`;
+  }
+  
+  sendMessage(process.env.DOLAR_TELEGRAM_GROUP_ID, message);
 }
