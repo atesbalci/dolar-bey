@@ -20,6 +20,8 @@ module.exports.handleDolarTelegram = function handleDolarTelegram(req, res) {
       refreshDolar(dolarData => {
         sendMessage(chatId, `Gunluk+Rekorum:+${dolarData.dailyRecord}`);
       });
+    } else if (command.includes('/testgroups')) {
+      sendMessageToGroups(chatId, `Group+subscribed`);
     }
   } catch (error) {
     console.log(error);
@@ -39,6 +41,12 @@ function onRecord(dolarData) {
   sendMessage(process.env.DOLAR_TELEGRAM_GROUP_ID, `REKORLARDAYIM:+${dolarData.record}`);
 }
 
+function sendMessageToGroups(message) {
+  process.env.DOLAR_TELEGRAM_GROUP_ID.split(',').forEach(group => {
+    sendMessage(group, message);
+  });
+}
+
 function onLocalReferenceChange(dolarData, diff) {
   let message;
   if (diff > 0) {
@@ -47,5 +55,5 @@ function onLocalReferenceChange(dolarData, diff) {
     message = `DU$U$LERDEYIM:+${dolarData.current}`;
   }
   
-  sendMessage(process.env.DOLAR_TELEGRAM_GROUP_ID, message);
+  sendMessageToGroups(message);
 }
