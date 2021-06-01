@@ -39,14 +39,14 @@ function sendMessage(chatId, message) {
   https.get(`${process.env.DOLAR_TELEGRAM_GROUP_URL_PREFIX}${chatId}&text=${message}`);
 }
 
-function onRecord(dolarData) {
-  sendMessage(process.env.DOLAR_TELEGRAM_GROUP_ID, `REKORLARDAYIM:+${dolarData.record}`);
-}
-
 function sendMessageToGroups(message) {
   process.env.DOLAR_TELEGRAM_GROUP_ID.split(',').forEach(group => {
     sendMessage(group, message);
   });
+}
+
+function onRecord(dolarData) {
+  sendMessageToGroups(`REKORLARDAYIM:+${dolarData.record}`);
 }
 
 function logChatId(chatId) {
