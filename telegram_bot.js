@@ -1,42 +1,45 @@
-const https = require('https');
-const { refreshDolar, DolarData, recordListeners, localReferenceListeners } = require('./dolar_utils');
+const { Telegraf } = require('telegraf');
+const { refreshDolar, recordListeners, localReferenceListeners } = require('./dolar_utils');
 
-module.exports.handleDolarTelegram = function handleDolarTelegram(req, res) {
+let bot;
+
+module.exports.startDolarTelegramBot = function(botToken) {
+  recordListeners.push(onRecord);
+  localReferenceListeners.push(onLocalReferenceChange);
+  bot = new Telegraf(botToken);
+  bot.on('text', onText);
+  bot.launch();
+}
+
+function onText(ctx) {
   try {
-    let chatId = req.body.message.chat.id;
-    let command = req.body.message.text;
+    let chatId = ctx.message.chat.id;
+    let command = ctx.message.text;
 
     if (command.includes('/dolarkac')) {
       refreshDolar(dolarData => {
         logChatId(chatId);
-        sendMessage(chatId, `Durumum:+${dolarData.current}`);
+        sendMessage(chatId, `Durumum: ${dolarData.current}`);
       });
     } else if (command.includes('/rekorkac')) {
       refreshDolar(dolarData => {
         logChatId(chatId);
-        sendMessage(chatId, `Rekorum:+${dolarData.record}`);
+        sendMessage(chatId, `Rekorum: ${dolarData.record}`);
       });
 
     } else if (command.includes('/gunlukrekor')) {
       refreshDolar(dolarData => {
         logChatId(chatId);
-        sendMessage(chatId, `Gunluk+Rekorum:+${dolarData.dailyRecord}`);
+        sendMessage(chatId, `Gunluk Rekorum: ${dolarData.dailyRecord}`);
       });
-    } else if (command.includes('/testgroups')) {
-      sendMessageToGroups(`Group+subscribed`);
     }
   } catch (error) {
     console.log(error);
   }
 }
 
-module.exports.initDolarTelegram = function initDolarTelegram() {
-  recordListeners.push(onRecord);
-  localReferenceListeners.push(onLocalReferenceChange);
-}
-
 function sendMessage(chatId, message) {
-  https.get(`${process.env.DOLAR_TELEGRAM_GROUP_URL_PREFIX}${chatId}&text=${message}`);
+  bot.telegram.sendMessage(chatId, message);
 }
 
 function sendMessageToGroups(message) {
@@ -46,7 +49,7 @@ function sendMessageToGroups(message) {
 }
 
 function onRecord(dolarData) {
-  sendMessageToGroups(`REKORLARDAYIM:+${dolarData.record}`);
+  sendMessageToGroups(`REKORLARDAYIM: ${dolarData.record}`);
 }
 
 function logChatId(chatId) {
@@ -56,9 +59,9 @@ function logChatId(chatId) {
 function onLocalReferenceChange(dolarData, diff) {
   let message;
   if (diff > 0) {
-    message = `CIKI$LARDAYIM:+${dolarData.current}`;
+    message = `CIKI$LARDAYIM: ${dolarData.current}`;
   } else {
-    message = `DU$U$LERDEYIM:+${dolarData.current}`;
+    message = `DU$U$LERDEYIM: ${dolarData.current}`;
   }
   
   sendMessageToGroups(message);
