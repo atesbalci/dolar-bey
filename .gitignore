@@ -111,3 +111,4 @@ ffmpeg.exe
 /audio
 /audio/*
 runner.sh
+dolar_config.json
