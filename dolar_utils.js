@@ -1,4 +1,4 @@
-const https = require('https');
+const { default: axios } = require('axios');
 
 const nowRegex = /imdi \$1 = ([0-9]+.[0-9]+)/;
 const recordRegex = /zamanlar Rekor \$1 = ([0-9]+.[0-9]+)/;
@@ -42,39 +42,36 @@ function onLocalReferenceChange(dolarData, diff) {
   }
 }
 
-module.exports.refreshDolar = function refreshDolar(callback) {
-  https.get('https://dolarrekorkirdimi.com', response => {
-    let body = '';
-    response.on('data', chunk => {
-      body += chunk;
-    });
-    response.on('end', () => {
-      try {
-        const tolerance = parseFloat(process.env.DOLAR_RECORD_TOLERANCE);
-        const newDolarData = new DolarData(body.match(nowRegex)[1], body.match(recordRegex)[1], body.match(dailyRecordRegex)[1]);
-        if (localReferencePoint < 0.01) {
-          localReferencePoint = newDolarData.current;
-        }
+module.exports.refreshDolar = async function refreshDolar() {
+  const result = await axios.get('https://dolarrekorkirdimi.com').catch(console.error);
+  if (result.status >= 300) return false;
+  try {
+    const body = result.data;
+    const tolerance = parseFloat(process.env.DOLAR_RECORD_TOLERANCE);
+    const newDolarData = new DolarData(body.match(nowRegex)[1], body.match(recordRegex)[1], body.match(dailyRecordRegex)[1]);
+    if (localReferencePoint < 0.01) {
+      localReferencePoint = newDolarData.current;
+    }
 
-        const diff = parseFloat(newDolarData.current) - localReferencePoint;
-        const localReferenceTolerance = parseFloat(process.env.DOLAR_LOCAL_TOLERANCE);
-        if (diff > localReferenceTolerance || diff < -localReferenceTolerance) {
-          onLocalReferenceChange(newDolarData, diff);
-        }
-        
-        if (lastRecord > 0.001) {
-          if (lastRecord + tolerance < parseFloat(newDolarData.record)) {
-            onRecord(newDolarData);
-          }
-        }
-        else {
-          lastRecord = parseFloat(newDolarData.record);
-        }
-
-        if(callback != null) callback(newDolarData);
-      } catch (err) {
-        console.log(err);
+    const diff = parseFloat(newDolarData.current) - localReferencePoint;
+    const localReferenceTolerance = parseFloat(process.env.DOLAR_LOCAL_TOLERANCE);
+    if (diff > localReferenceTolerance || diff < -localReferenceTolerance) {
+      onLocalReferenceChange(newDolarData, diff);
+    }
+    
+    if (lastRecord > 0.001) {
+      if (lastRecord + tolerance < parseFloat(newDolarData.record)) {
+        onRecord(newDolarData);
       }
-    });
-  }).end();
+    }
+    else {
+      lastRecord = parseFloat(newDolarData.record);
+    }
+
+    return newDolarData;
+  } catch (err) {
+    console.log(err);
+  }
+
+  return null;
 }

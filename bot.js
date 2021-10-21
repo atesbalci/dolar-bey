@@ -16,15 +16,14 @@ async function handleInteraction(interaction) {
   if (interaction.isCommand()) {
     const commandName = interaction.commandName;
     await interaction.deferReply();
-    refreshDolar(dolarData => {
-      if (commandName === gunlukRekorKacCommandName) {
-        interaction.followUp(`Gunluk Rekorum: ${dolarData.dailyRecord}`);
-      } else if (commandName === rekorKacCommandName) {
-        interaction.followUp(`Rekorum: ${dolarData.record}`);
-      } else if (commandName === dolarKacCommandName) {
-        interaction.followUp(`Durumum: ${dolarData.current}`);
-      }
-    });
+    const dolarData = await refreshDolar();
+    if (commandName === gunlukRekorKacCommandName) {
+      interaction.followUp(`Gunluk Rekorum: ${dolarData.dailyRecord}`);
+    } else if (commandName === rekorKacCommandName) {
+      interaction.followUp(`Rekorum: ${dolarData.record}`);
+    } else if (commandName === dolarKacCommandName) {
+      interaction.followUp(`Durumum: ${dolarData.current}`);
+    }
   }
 }
 
@@ -65,9 +64,9 @@ module.exports.startDolarBot = function startDolarBot(token) {
     console.error(`${getTime()}: Unhandled promise rejection:`, error);
   });
 
-  refreshDolar(null);
+  refreshDolar();
   recordListeners.push(onRecord);
-  setInterval(() => refreshDolar(null), 300000);
+  setInterval(() => refreshDolar(), 300000);
 
   client.login(token);
 }

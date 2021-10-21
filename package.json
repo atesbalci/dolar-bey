@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/atesbalci/dolar-bey#readme",
   "dependencies": {
+    "axios": "^0.23.0",
     "discord.js": "^13.2.0",
     "express": "^4.17.1",
     "https": "^1.0.0",

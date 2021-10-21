@@ -11,27 +11,23 @@ module.exports.startDolarTelegramBot = function(botToken) {
   bot.launch();
 }
 
-function onText(ctx) {
+async function onText(ctx) {
   try {
     let chatId = ctx.message.chat.id;
     let command = ctx.message.text;
 
     if (command.includes('/dolarkac')) {
-      refreshDolar(dolarData => {
-        logChatId(chatId);
-        sendMessage(chatId, `Durumum: ${dolarData.current}`);
-      });
+      const dolarData = await refreshDolar();
+      logChatId(chatId);
+      sendMessage(chatId, `Durumum: ${dolarData.current}`);
     } else if (command.includes('/rekorkac')) {
-      refreshDolar(dolarData => {
-        logChatId(chatId);
-        sendMessage(chatId, `Rekorum: ${dolarData.record}`);
-      });
-
+      const dolarData = await refreshDolar();
+      logChatId(chatId);
+      sendMessage(chatId, `Rekorum: ${dolarData.record}`);
     } else if (command.includes('/gunlukrekor')) {
-      refreshDolar(dolarData => {
-        logChatId(chatId);
-        sendMessage(chatId, `Gunluk Rekorum: ${dolarData.dailyRecord}`);
-      });
+      const dolarData = await refreshDolar();
+      logChatId(chatId);
+      sendMessage(chatId, `Gunluk Rekorum: ${dolarData.dailyRecord}`);
     }
   } catch (error) {
     console.log(error);
