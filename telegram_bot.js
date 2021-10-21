@@ -28,9 +28,9 @@ async function onText(ctx) {
       const dolarData = await refreshDolar();
       logChatId(chatId);
       sendMessage(chatId, `Gunluk Rekorum: ${dolarData.dailyRecord}`);
-    } else if (command.includes('/toggleRiseAndFall') || command.includes('/toggleRecord')) {
+    } else if (command.includes('/toggleriseandfall') || command.includes('/togglerecord')) {
       let subType;
-      if (command.includes('/toggleRiseAndFall')) {
+      if (command.includes('/toggleriseandfall')) {
         subType = SubscriptionType.RISE_AND_FALL;
       }
       else {
