@@ -45,7 +45,7 @@ async function onText(ctx) {
         removeSub(Platform.TELEGRAM, subType, chatId);
         sendMessage(chatId, 'Tamam tamam... sustum...');
       }
-    } else if (command.includes('/subStatus')) {
+    } else if (command.includes('/substatus')) {
       let msg = `Rekor Mesajlari: ${subExists(Platform.TELEGRAM, SubscriptionType.RECORD, chatId) ? 'ACIK' : 'KAPALI'}\n`;
       msg += `Cikis/Inis Mesajlari: ${subExists(Platform.TELEGRAM, SubscriptionType.RISE_AND_FALL, chatId) ? 'ACIK' : 'KAPALI'}`;
       sendMessage(chatId, msg);
