@@ -52,7 +52,6 @@ module.exports.startDolarBot = function startDolarBot(token) {
 
   client.on('ready', () => {
     console.log(`${getTime()}: Logged in as ${client.user.tag}\n===============================================`);
-    client.channels.fetch(process.env.RECORD_CHANNEL_ID).then(c => channel = c);
     client.application.commands.set([
       {
         name: dolarKacCommandName,
