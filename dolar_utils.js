@@ -1,8 +1,8 @@
 const { default: axios } = require('axios');
+const { getRecord, setNewRecord } = require('./config');
 
-const nowRegex = /imdi \$1 = ([0-9]+.[0-9]+)/;
-const recordRegex = /zamanlar Rekor \$1 = ([0-9]+.[0-9]+)/;
-const dailyRecordRegex = /i Rekor \$1 = ([0-9]+.[0-9]+)/;
+const nowRegex = /class="YMlKec fxKbKc">([0-9]+\.[0-9]+)</;
+const dailyRecordRegex = /class="textRight__c48cb57cd6">"([0-9]+\.[0-9]+)"</; // TODO
 
 const recordListeners = [];
 const localReferenceListeners = [];
@@ -10,7 +10,6 @@ const localReferenceListeners = [];
 module.exports.recordListeners = recordListeners;
 module.exports.localReferenceListeners = localReferenceListeners;
 
-let lastRecord = 0.0;
 let localReferencePoint = 0.0;
 
 class DolarData {
@@ -43,12 +42,13 @@ function onLocalReferenceChange(dolarData, diff) {
 }
 
 module.exports.refreshDolar = async function refreshDolar() {
-  const result = await axios.get('https://dolarrekorkirdimi.com').catch(console.error);
+  const result = await axios.get('https://www.google.com/finance/quote/USD-TRY?hl=en').catch(console.error);
   if (result.status >= 300) return false;
   try {
     const body = result.data;
     const tolerance = parseFloat(process.env.DOLAR_RECORD_TOLERANCE);
-    const newDolarData = new DolarData(body.match(nowRegex)[1], body.match(recordRegex)[1], body.match(dailyRecordRegex)[1]);
+    // console.log(body);
+    const newDolarData = new DolarData(body.match(nowRegex)[1], getRecord(), body.match(nowRegex)[1]);
     if (localReferencePoint < 0.01) {
       localReferencePoint = newDolarData.current;
     }
@@ -59,13 +59,11 @@ module.exports.refreshDolar = async function refreshDolar() {
       onLocalReferenceChange(newDolarData, diff);
     }
     
-    if (lastRecord > 0.001) {
-      if (lastRecord + tolerance < parseFloat(newDolarData.record)) {
+    if (newDolarData.record > 0.001) {
+      if (newDolarData.record + tolerance < newDolarData.record) {
+        setNewRecord(newDolarData.record);
         onRecord(newDolarData);
       }
-    }
-    else {
-      lastRecord = parseFloat(newDolarData.record);
     }
 
     return newDolarData;

@@ -6,6 +6,7 @@ const configFile = 'dolar_config.json';
 class Config {
   constructor() {
     this.subscriptions = [];
+    this.record = 999999; // An arbitrarily large initial number
   }
 }
 
@@ -59,6 +60,15 @@ module.exports.getSubsFor = function (platform, type) {
 module.exports.subExists = function (platform, type, chatId) {
   const oldSub = { platform: platform, type: type, chatId: chatId };
   return config.subscriptions.some(element => subEquals(element, oldSub));
+}
+
+module.exports.setNewRecord = function (newRecord) {
+  config.record = newRecord;
+  saveConfig();
+}
+
+module.exports.getRecord = function () {
+  return config.record;
 }
 
 module.exports.Platform = Platform;
