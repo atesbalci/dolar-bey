@@ -1,7 +1,7 @@
 const { default: axios } = require('axios');
 const { getRecord, setNewRecord } = require('./config');
 
-const nowRegex = /class="YMlKec fxKbKc">([0-9]+\.[0-9]+)</;
+const nowRegex = />(\d+\.\d+)</;
 const dailyRecordRegex = /class="textRight__c48cb57cd6">"([0-9]+\.[0-9]+)"</; // TODO
 
 const recordListeners = [];
@@ -60,7 +60,8 @@ module.exports.refreshDolar = async function refreshDolar() {
     }
     
     if (newDolarData.record > 0.001) {
-      if (newDolarData.record + tolerance < newDolarData.record) {
+      if (newDolarData.record + tolerance < newDolarData.current) {
+        newDolarData.record = newDolarData.current;
         setNewRecord(newDolarData.record);
         onRecord(newDolarData);
       }
