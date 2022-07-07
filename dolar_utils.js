@@ -1,8 +1,6 @@
 const { default: axios } = require('axios');
 const { getRecord, setNewRecord } = require('./config');
-
-const nowRegex = />(\d+\.\d+)</;
-const dailyRecordRegex = /class="textRight__c48cb57cd6">"([0-9]+\.[0-9]+)"</; // TODO
+const { getFromWise } = require('./wise_getter');
 
 const recordListeners = [];
 const localReferenceListeners = [];
@@ -11,16 +9,6 @@ module.exports.recordListeners = recordListeners;
 module.exports.localReferenceListeners = localReferenceListeners;
 
 let localReferencePoint = 0.0;
-
-class DolarData {
-  constructor(current, record, dailyRecord) {
-    this.current = current;
-    this.record = record;
-    this.dailyRecord = dailyRecord;
-  }
-}
-
-module.exports.DolarData = DolarData;
 
 function onRecord(dolarData) {
   lastRecord = parseFloat(dolarData.record);
@@ -42,13 +30,12 @@ function onLocalReferenceChange(dolarData, diff) {
 }
 
 module.exports.refreshDolar = async function refreshDolar() {
-  const result = await axios.get('https://www.google.com/finance/quote/USD-TRY?hl=en').catch(console.error);
+  const result = await axios.get('https://wise.com/rates/history+live?source=USD&target=TRY&length=2&resolution=hourly&unit=day').catch(console.error);
   if (result.status >= 300) return false;
   try {
-    const body = result.data;
     const tolerance = parseFloat(process.env.DOLAR_RECORD_TOLERANCE);
-    // console.log(body);
-    const newDolarData = new DolarData(body.match(nowRegex)[1], getRecord(), body.match(nowRegex)[1]);
+    const newDolarData = getFromWise(result.data);
+    if (!newDolarData || newDolarData.current < 0.001) return null;
     if (localReferencePoint < 0.01) {
       localReferencePoint = newDolarData.current;
     }
@@ -59,12 +46,10 @@ module.exports.refreshDolar = async function refreshDolar() {
       onLocalReferenceChange(newDolarData, diff);
     }
     
-    if (newDolarData.record > 0.001) {
-      if (newDolarData.record + tolerance < newDolarData.current) {
-        newDolarData.record = newDolarData.current;
-        setNewRecord(newDolarData.record);
-        onRecord(newDolarData);
-      }
+    if (newDolarData.record + tolerance < newDolarData.current) {
+      newDolarData.record = newDolarData.current;
+      setNewRecord(newDolarData.record);
+      onRecord(newDolarData);
     }
 
     return newDolarData;
