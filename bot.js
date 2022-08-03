@@ -107,7 +107,6 @@ module.exports.startDolarBot = function startDolarBot(token) {
   refreshDolar();
   recordListeners.push(onRecord);
   localReferenceListeners.push(onLocalReferenceChange);
-  setInterval(() => refreshDolar(), 300000);
 
   client.login(token);
 }
