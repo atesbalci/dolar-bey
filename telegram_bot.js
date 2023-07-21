@@ -8,51 +8,55 @@ module.exports.startDolarTelegramBot = function(botToken) {
   recordListeners.push(onRecord);
   localReferenceListeners.push(onLocalReferenceChange);
   bot = new Telegraf(botToken);
-  bot.on('text', onText);
+  bot.command('dolarkac', dollarQueryCommand);
+  bot.command('gunlukrekor', dailyRecordQueryCommand);
+  bot.command('rekorkac', recordQueryCommand);
+  bot.command('togglerecord', toggleRecordCommand);
+  bot.command('toggleriseandfall', toggleRiseAndFallCommand);
+  bot.command('substatus', subStatusQueryCommand);
   bot.launch();
 }
 
-async function onText(ctx) {
-  try {
-    let chatId = ctx.message.chat.id;
-    let command = ctx.message.text;
-    if (command.includes('/dolarkac')) {
-      const dolarData = await refreshDolar();
-      logChatId(chatId);
-      sendMessage(chatId, `Durumum: ${dolarData.current}`);
-    } else if (command.includes('/rekorkac')) {
-      const dolarData = await refreshDolar();
-      logChatId(chatId);
-      sendMessage(chatId, `Rekorum: ${dolarData.record}`);
-    } else if (command.includes('/gunlukrekor')) {
-      const dolarData = await refreshDolar();
-      logChatId(chatId);
-      sendMessage(chatId, `Gunluk Rekorum: ${dolarData.dailyRecord}`);
-    } else if (command.includes('/toggleriseandfall') || command.includes('/togglerecord')) {
-      let subType;
-      if (command.includes('/toggleriseandfall')) {
-        subType = SubscriptionType.RISE_AND_FALL;
-      }
-      else {
-        subType = SubscriptionType.RECORD;
-      }
+async function dollarQueryCommand(ctx) {
+  const dolarData = await refreshDolar();
+  ctx.reply(`Durumum: ${dolarData.current}`);
+}
 
-      if (!subExists(Platform.TELEGRAM, subType, chatId)) {
-        addSub(Platform.TELEGRAM, subType, chatId);
-        sendMessage(chatId, 'Yazacam buraya...');
-      }
-      else {
-        removeSub(Platform.TELEGRAM, subType, chatId);
-        sendMessage(chatId, 'Tamam tamam... sustum...');
-      }
-    } else if (command.includes('/substatus')) {
-      let msg = `Rekor Mesajlari: ${subExists(Platform.TELEGRAM, SubscriptionType.RECORD, chatId) ? 'ACIK' : 'KAPALI'}\n`;
-      msg += `Cikis/Inis Mesajlari: ${subExists(Platform.TELEGRAM, SubscriptionType.RISE_AND_FALL, chatId) ? 'ACIK' : 'KAPALI'}`;
-      sendMessage(chatId, msg);
-    }
-  } catch (error) {
-    console.log(error);
+async function recordQueryCommand(ctx) {
+  const dolarData = await refreshDolar();
+  ctx.reply(`Rekorum: ${dolarData.record}`);
+}
+
+async function dailyRecordQueryCommand(ctx) {
+  const dolarData = await refreshDolar();
+  ctx.reply(`Gunluk Rekorum: ${dolarData.dailyRecord}`);
+}
+
+function toggleSub(ctx, subType) {
+  const chatId = ctx.message.chat.id;
+  if (!subExists(Platform.TELEGRAM, subType, chatId)) {
+    addSub(Platform.TELEGRAM, subType, chatId);
+    ctx.reply('Yazacam buraya...');
   }
+  else {
+    removeSub(Platform.TELEGRAM, subType, chatId);
+    ctx.reply('Tamam tamam... sustum...');
+  }
+}
+
+function toggleRiseAndFallCommand(ctx) {
+  toggleSub(ctx, SubscriptionType.RISE_AND_FALL);
+}
+
+function toggleRecordCommand(ctx) {
+  toggleSub(ctx, SubscriptionType.RECORD);
+}
+
+function subStatusQueryCommand(ctx) {
+  const chatId = ctx.message.chat.id;
+  let msg = `Rekor Mesajlari: ${subExists(Platform.TELEGRAM, SubscriptionType.RECORD, chatId) ? 'ACIK' : 'KAPALI'}\n`;
+  msg += `Cikis/Inis Mesajlari: ${subExists(Platform.TELEGRAM, SubscriptionType.RISE_AND_FALL, chatId) ? 'ACIK' : 'KAPALI'}`;
+  ctx.reply(msg);
 }
 
 function sendMessage(chatId, message) {
